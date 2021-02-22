@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  stripe: MyString
+  paypal: MyString
+  transbank_credito: MyString
+  transbank_webpay: MyString
+  transbank_onepay: MyString
+
+two:
+  stripe: MyString
+  paypal: MyString
+  transbank_credito: MyString
+  transbank_webpay: MyString
+  transbank_onepay: MyString
