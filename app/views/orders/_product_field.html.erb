@@ -1,0 +1,4 @@
+<div class="form-group">
+    <%= f.label :product_id, "Select Product" %>
+    <%= f.collection_select :product_id, Product.order(:name), :id, :name,{ include_blank: true} %>
+</div>
