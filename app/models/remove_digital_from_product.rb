@@ -1,0 +1,2 @@
+class RemoveDigitalFromProduct < ApplicationRecord
+end

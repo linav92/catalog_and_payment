@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_27_232319) do
+ActiveRecord::Schema.define(version: 2021_03_28_030518) do
 
   create_table "clients", force: :cascade do |t|
     t.string "name"
@@ -34,6 +34,7 @@ ActiveRecord::Schema.define(version: 2021_02_27_232319) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.decimal "price"
+    t.integer "method_payment_id"
     t.index ["client_id"], name: "index_orders_on_client_id"
     t.index ["payment_id"], name: "index_orders_on_payment_id"
     t.index ["product_id"], name: "index_orders_on_product_id"
@@ -45,16 +46,33 @@ ActiveRecord::Schema.define(version: 2021_02_27_232319) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "product_digitals", force: :cascade do |t|
+    t.string "description"
+    t.integer "product_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["product_id"], name: "index_product_digitals_on_product_id"
+  end
+
+  create_table "product_fisicos", force: :cascade do |t|
+    t.string "description"
+    t.integer "product_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["product_id"], name: "index_product_fisicos_on_product_id"
+  end
+
   create_table "products", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "digital"
-    t.integer "fisico"
   end
 
   add_foreign_key "method_payments", "payments"
   add_foreign_key "orders", "clients"
+  add_foreign_key "orders", "method_payments"
   add_foreign_key "orders", "payments"
   add_foreign_key "orders", "products"
+  add_foreign_key "product_digitals", "products"
+  add_foreign_key "product_fisicos", "products"
 end

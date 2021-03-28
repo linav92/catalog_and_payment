@@ -21,7 +21,13 @@ class OrdersController < ApplicationController
 
   # POST /orders or /orders.json
   def create
-    @order = Order.new(order_params)
+   #@order = Order.new(order_params)
+   
+   @order= Order.new()
+   @product = Product.find(params[:product_id])
+   @order.number=params[:number]
+   @order.product_id = @product.id
+   @order.payment_id =
 
     respond_to do |format|
       if @order.save
@@ -56,6 +62,28 @@ class OrdersController < ApplicationController
     end
   end
 
+  def pago
+    @data = params[:order]
+  end
+
+  def met_pago
+    @data = params
+
+    p "AQYUUii",@data
+    @order = Order.new
+    @order.number = params[:number]
+    @order.client_id = 1
+    @order.product_id = params[:product_id]
+    @order.payment_id = params[:payment_id]
+    @order.method_payment_id = params[:method_id]
+    @order.save()
+
+    respond_to do |format|
+      format.html { redirect_to orders_url, notice: "Order was successfully success." }
+    
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_order
@@ -64,6 +92,6 @@ class OrdersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def order_params
-      params.require(:order).permit(:number, :client_id, :product_id, :payment_id)
+      params.require(:order).permit(:number,  :product_id)
     end
 end

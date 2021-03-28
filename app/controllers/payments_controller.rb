@@ -13,6 +13,7 @@ class PaymentsController < ApplicationController
   # GET /payments/new
   def new
     @payment = Payment.new
+ 
   end
 
   # GET /payments/1/edit
@@ -21,8 +22,9 @@ class PaymentsController < ApplicationController
 
   # POST /payments or /payments.json
   def create
-    @payment = Payment.new(payment_params)
+    @payment = Payment.new()
 
+    p.params
     respond_to do |format|
       if @payment.save
         format.html { redirect_to @payment, notice: "Payment was successfully created." }
@@ -64,6 +66,6 @@ class PaymentsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def payment_params
-      params.require(:payment).permit(:name)
+      params.require(:payment).permit(:name, :description)
     end
 end

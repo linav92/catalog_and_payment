@@ -1,4 +1,4 @@
-<%= form_with(model: order, local: true) do |form| %>
+<%= form_with(model: order, local: true,url:"/orders/pago") do |form| %>
   <% if order.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(order.errors.count, "error") %> prohibited this order from being saved:</h2>
@@ -16,18 +16,21 @@
     <%= form.text_field :number %>
   </div>
 
-  <div class="field">  
+  
+
+  <div class="field">
     <%= form.label :product_id, "Select Product" %>
     <%= form.collection_select :product_id, Product.order(:name), :id, :name,{ include_blank: true} %>
   </div>
 
+  
 
-  <div class="field">
-    <%= form.label :payment_id %>
-    <%= form.text_field :payment_id %>
+  <div class="field">  
+    <%= form.label :payment_id, "Select Payment" %>
+    <%= form.collection_select :payment_id, Payment.order(:name), :id, :name,{ include_blank: true} %>
   </div>
 
   <div class="actions">
-    <%= form.submit %>
+    <%= form.submit 'Next' %>
   </div>
 <% end %>

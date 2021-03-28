@@ -1,2 +1,27 @@
-<h1>Home#index</h1>
-<p>Find me in app/views/home/index.html.erb</p>
+<%= form_with url: "/orders", method: :post do |form| %>
+  
+
+  <div class="field">
+    <%= form.label :number, "Order Number" %>
+    <%= form.text_field :number %>
+  </div>
+
+  <div class="field">
+    <%= form.label :product_id, "Select Product" %>
+    <%= form.collection_select :product_id, Product.order(:name), :id, :name,{ include_blank: true} %>
+  </div>
+
+  <div class="field">  
+    <%= form.label :payment_id, "Select Payment" %>
+    <%= form.collection_select :payment_id, Payment.order(:name), :id, :name,{ include_blank: true} %>
+  </div>
+
+  <div class="field">
+    <%= form.label :method_payment_id %>
+    <%= form.collection_select :method_payment_id, MethodPayment.order(:description), :id, :description,{ include_blank: true} %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit 'Create' %>
+  </div>
+<% end %>
