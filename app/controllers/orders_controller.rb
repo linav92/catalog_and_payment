@@ -68,8 +68,7 @@ class OrdersController < ApplicationController
 
   def met_pago
     @data = params
-
-    p "AQYUUii",@data
+    
     @order = Order.new
     @order.number = params[:number]
     @order.client_id = 1

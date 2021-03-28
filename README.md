@@ -1,4 +1,4 @@
-# Desafío Catálogo y sistema de pago 🚀
+  # Desafío Catálogo y sistema de pago 🚀
 
 Para realizar este desafío debes haber estudiado previamente todo el material
 disponibilizado correspondiente a la unidad.
@@ -30,9 +30,6 @@ class CreateProducts < ActiveRecord::Migration[6.0]
   def change
     create_table :products do |t|
       t.string :name
-      t.integer :digital
-      t.integer :fisico
-
       t.timestamps
     end
   end
@@ -42,8 +39,6 @@ end
 ```sh
 create_table "products", force: :cascade do |t|
     t.string "name"
-    t.integer "digital"
-    t.integer "fisico"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -51,15 +46,44 @@ create_table "products", force: :cascade do |t|
 ```sh
 class Product < ApplicationRecord
     has_many :orders
+    has_many :product_digitals
+    has_many :product_fisicos
 end
 ```
+  ```sh
+create_table "product_digitals", force: :cascade do |t|
+    t.string "description"
+    t.integer "product_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["product_id"], name: "index_product_digitals_on_product_id"
+  end
+  ```
+```sh
+create_table "product_fisicos", force: :cascade do |t|
+    t.string "description"
+    t.integer "product_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["product_id"], name: "index_product_fisicos_on_product_id"
+  end
+´´´
+´´´sh
+class ProductFisico < ApplicationRecord
+  belongs_to :product
+end
+
+class ProductDigital < ApplicationRecord
+  belongs_to :product
+end
+
+  ```
 Las migraciones y los modelos de los pago son:
 ```sh
 class CreatePayments < ActiveRecord::Migration[6.0]
   def change
     create_table :payments do |t|
       t.string :name
-
       t.timestamps
     end
   end
@@ -71,15 +95,15 @@ create_table "payments", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
-```
-```sh
+  ```
+  ```sh
 class Payment < ApplicationRecord
     has_many :method_payments
     has_many :orders, through: :method_payments
 end
-```
+  ```
 Las migraciones y los modelos de los métodos pago son:
-```sh
+  ```sh
 class CreateMethodPayments < ActiveRecord::Migration[6.0]
   def change
     create_table :method_payments do |t|
@@ -89,8 +113,8 @@ class CreateMethodPayments < ActiveRecord::Migration[6.0]
     end
   end
 end
-```
-```sh
+  ```
+  ```sh
 create_table "method_payments", force: :cascade do |t|
     t.string "description"
     t.integer "payment_id", null: false
@@ -98,56 +122,41 @@ create_table "method_payments", force: :cascade do |t|
     t.datetime "updated_at", precision: 6, null: false
     t.index ["payment_id"], name: "index_method_payments_on_payment_id"
   end
-```
-```sh
+  ```
+  ```sh
 class MethodPayment < ApplicationRecord
   belongs_to :payment
   belongs_to :order
 end
 
-```
+  ```
 Se debe crear los modelos `client` y `ordeer` para continuar con el sistema e-commerce
 Modelos y migraciones de clientes:
-```sh
+  ```sh
 class CreateClients < ActiveRecord::Migration[6.0]
   def change
     create_table :clients do |t|
       t.string :name
-
       t.timestamps
     end
   end
 end
-```
-```sh
+  ```
+  ```sh
 create_table "clients", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
-```
-```sh
+  ```
+  ```sh
 class Client < ApplicationRecord
     has_many :orders
 end
-```
+  ```
 Modelo y migraciones de Orders
 ```sh
-class CreateOrders < ActiveRecord::Migration[6.0]
-  def change
-    create_table :orders do |t|
-      t.integer :number
-      t.decimal :price
-      t.references :client, null: false, foreign_key: true
-      t.references :product, null: false, foreign_key: true
-      t.references :payment, null: false, foreign_key: true
-
-      t.timestamps
-    end
-  end
-end
-```
-```sh
+  ```sh
 create_table "orders", force: :cascade do |t|
     t.integer "number"
     t.integer "client_id", null: false
@@ -156,20 +165,98 @@ create_table "orders", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.decimal "price"
+    t.integer "method_payment_id"
     t.index ["client_id"], name: "index_orders_on_client_id"
     t.index ["payment_id"], name: "index_orders_on_payment_id"
     t.index ["product_id"], name: "index_orders_on_product_id"
   end
-```
+  ```
 En el model `orders.rb` se debe crear el polimorfismo el cual solo permite un número de orden por cliente (no se puede repetir el mismo número de orden con otro cliente)
-```sh
+  ```sh
 class Order < ApplicationRecord
   belongs_to :client, optional: true
   belongs_to :product, optional: true
   has_many :method_payments
   has_many :payments, through: :method_payments
-```
+  ```
  Se realizó el polimorfismo **Join Table** en el modelo `order.rb` ya que los pagos se pueden realizar de distintas formas (Stripe, Paypal y Transbank) 
+ 
+ Para realizar el formulario de medios de pago se debe crear un form en *order* el cual se debe redirigir a un método **pago**
+   ```sh
+ <%= form_with(model: order, local: true,url:"/orders/pago") do |form| %>
+  <% if order.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(order.errors.count, "error") %> prohibited this order from being saved:</h2>
+
+      <ul>
+        <% order.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :number, "Order Number" %>
+    <%= form.text_field :number %>
+  </div>
+
+  <div class="field">
+    <%= form.label :product_id, "Select Product" %>
+    <%= form.collection_select :product_id, Product.order(:name), :id, :name,{ include_blank: true} %>
+  </div>
+
+  <div class="field">  
+    <%= form.label :payment_id, "Select Payment" %>
+    <%= form.collection_select :payment_id, Payment.order(:name), :id, :name,{ include_blank: true} %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit 'Next' %>
+  </div>
+<% end %>
+  ```
+ En el controlador ´order_controller.rb´ se crea dos métodos: *pago* y *met_pago*. El primero es para obtener los datos del formulario anterior y el segundo es para guardar en la base de datos
+  ```sh
+  def pago
+    @data = params[:order]
+  end
+
+  def met_pago
+    @data = params
+    
+    @order = Order.new
+    @order.number = params[:number]
+    @order.client_id = 1
+    @order.product_id = params[:product_id]
+    @order.payment_id = params[:payment_id]
+    @order.method_payment_id = params[:method_id]
+    @order.save()
+
+    respond_to do |format|
+      format.html { redirect_to orders_url, notice: "Order was successfully success." }
+    
+    end
+  end
+  ```
+ Por otra parte se crean la siguiente parte del formulario para seleccionar el método de pago
+   ```sh
+ <%= form_with url:"/orders/met_pago" do |f| %>
+
+    <%= f.hidden_field :number,value:@data[:number] %>
+    <%= f.hidden_field :product_id,value:@data[:product_id] %>
+    <%= f.hidden_field :payment_id,value:@data[:payment_id] %>
+
+  <div class="field">
+    <%= f.select :method_id, options_for_select(
+   MethodPayment.where(payment_id: @data[:payment_id]).all.map{ |p| [p.description,p.id] }) %>
+  </div>
+
+    <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
+  ```
 # Parte 2 📦 
 
   - Uno de los alumnos no conoce lo que es el polimorfismo y crea registros en la base de datos haciendo operaciones del estilo:
